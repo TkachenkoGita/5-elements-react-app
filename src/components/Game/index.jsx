@@ -1,14 +1,16 @@
-function Game() {
+function Game(props) {
+    const { step, question, onclickVariant, questions } = props;
+    const percentage = Math.round((step / questions.length * 100));
   return (
     <>
       <div className="progress">
-        <div style={{ width: "50%" }} className="progress__inner"></div>
+        <div style={{ width: `${percentage}%` }} className="progress__inner"></div>
       </div>
-      <h1>Что такое useState?</h1>
-      <ul>
-        <li>Это функция для хранения данных компонента</li>
-        <li>Это глобальный стейт</li>
-        <li>Это когда на ты никому не нужен</li>
+          <h1>{question.title}</h1>
+          <ul>
+              {
+                  question.variants.map((v, index) => (<li onClick={()=>onclickVariant(index)} key={v}>{v}</li>)) 
+              }
       </ul>
     </>
   );

@@ -1,5 +1,7 @@
+import { useState } from "react";
 import Game from "./components/Game";
 import "./index.scss";
+import Result from "./components/Result";
 
 const questions = [
   {
@@ -27,13 +29,28 @@ const questions = [
   },
 ];
 
-
-
 function App() {
+  const [step, setStep] = useState(0);
+  const [correct, setCorrect] = useState(0);
+  const question = questions[step];
+  const onclickVariant = (index) => {
+    setStep(step + 1);
+    if (index === question.correct) {
+      setCorrect(correct+1)
+    }
+  };
   return (
     <div className="App">
-      <Game />
-      {/* <Result /> */}
+      {step !== questions.length ? (
+        <Game
+          step={step}
+          question={question}
+          onclickVariant={onclickVariant}
+          questions={questions}
+        />
+      ) : (
+          <Result correct={correct} questions={questions} />
+      )}
     </div>
   );
 }
