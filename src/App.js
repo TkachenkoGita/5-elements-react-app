@@ -1,55 +1,55 @@
-import { useState } from "react";
-import Game from "./components/Game";
+import React, { useEffect, useState } from "react";
 import "./index.scss";
-import Result from "./components/Result";
+import Users from "./components/Users";
+import Success from "./components/Success";
 
-const questions = [
-  {
-    title: "React - это ... ?",
-    variants: ["библиотека", "фреймворк", "приложение"],
-    correct: 0,
-  },
-  {
-    title: "Компонент - это ... ",
-    variants: [
-      "приложение",
-      "часть приложения или страницы",
-      "то, что я не знаю что такое",
-    ],
-    correct: 1,
-  },
-  {
-    title: "Что такое JSX?",
-    variants: [
-      "Это простой HTML",
-      "Это функция",
-      "Это тот же HTML, но с возможностью выполнять JS-код",
-    ],
-    correct: 2,
-  },
-];
+
+// Тут список пользователей: https://reqres.in/api/users
 
 function App() {
-  const [step, setStep] = useState(0);
-  const [correct, setCorrect] = useState(0);
-  const question = questions[step];
-  const onclickVariant = (index) => {
-    setStep(step + 1);
-    if (index === question.correct) {
-      setCorrect(correct+1)
+  const [users, setUsers] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchValue, setSearchValue] = useState("");
+  const [invites, setInvites] = useState([]);
+  const [success, setSuccess] = useState(false);
+  useEffect(() => {
+    fetch("https://reqres.in/api/users")
+      .then((response) => response.json())
+      .then((json) => setUsers(json.data))
+      .catch((err) => {
+        console.warn(err);
+        alert("ошибка при получении пользователя");
+      })
+      .finally(() => setIsLoading(false));
+  }, []);
+  const onChangeSearchValue = ({ target: { value } }) => {
+    setSearchValue(value);
+  };
+  const onClickInvite = (id) => {
+    if (invites.includes(id)) {
+      setInvites((prev) => prev.filter((_id) => _id !== id));
+    } else {
+      setInvites((prev) => [...prev, id]);
     }
   };
+
+  const onClickSetInvites = () => {
+    setSuccess(true)
+  }
   return (
     <div className="App">
-      {step !== questions.length ? (
-        <Game
-          step={step}
-          question={question}
-          onclickVariant={onclickVariant}
-          questions={questions}
-        />
+      {success ? (
+        <Success count={invites.length} />
       ) : (
-          <Result correct={correct} questions={questions} />
+        <Users
+          onChangeSearchValue={onChangeSearchValue}
+          searchValue={searchValue}
+          items={users}
+          isLoading={isLoading}
+          invites={invites}
+            onClickInvite={onClickInvite}
+            onClickSetInvites={onClickSetInvites}
+        />
       )}
     </div>
   );
